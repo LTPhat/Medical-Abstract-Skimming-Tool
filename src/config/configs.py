@@ -55,16 +55,31 @@ class Params(object):
         self.BERT_PROCESS_DIR = project_root + "/bert/bert_en_uncased_preprocess_3"       
         self.BERT_EMBED_DIR =  project_root + "/bert/experts_bert_pubmed_2"                # Pretrained BERT layer
 
+        # TRANSFORMER MODEL PARAMS
+        self.NUM_LAYERS = 2
+        self.N_HEAD = 8
+        self.DIM_FEEDFORWARD = 256
+        self.D_MODEL = 128
 
         # CHECKPOINT DIR
-        self.WORD_MODEL_DIR = project_root + "/checkpoints/word_model"
-        self.NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/nor_model"
-        self.BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/bert_model"
+            ## attention-based dir
+        self.WORD_MODEL_ATT_DIR = project_root + "/checkpoints/word_model"
+            ## penta-model
+        self.PENTA_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/nor_model"
+        self.PENTA_BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/bert_model"
+        self.PENTA_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/glove_model"
+        self.TF_BASED_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model"
+            ## Hybrid model
+        self.HYBRID_NOR_MODEL_DIR = project_root + "/checkpoints/hybrid_model/nor_model"
+        
+        # Test-result dir
+        self.RESULT_DIR = project_root + "/results.txt"
+
 if __name__ == "__main__":
     params = Params()
     print(os.path.exists(params.DATA_DIR))
     print(os.path.exists(params.GLOVE_DIR))
-    print(os.path.exists(params.WORD_MODEL_DIR))
+    print(os.path.exists(params.RESULT_DIR))
     # hub = hub.load(params.BERT_EMBED_DIR)
     print("Done")
 
