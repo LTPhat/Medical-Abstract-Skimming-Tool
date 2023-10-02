@@ -4,14 +4,19 @@ from tensorflow.keras import layers
 import tensorflow_hub as hub
 import tensorflow_text as text
 import string
-from utils import *
 import warnings
 warnings.filterwarnings('ignore')
 import sys
+import os
 
-from config.configs import * 
+
+parent_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
+sys.path.append(parent_root)
+from src.utils import *
+from src.config.configs import * 
 
 params = Params()
+
 
 
 class Embeddings(object):
