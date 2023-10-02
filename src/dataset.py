@@ -1,14 +1,16 @@
 import sys
-from config.configs import *
 import pandas as pd
-from utils import get_information, split_into_char
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 import warnings
+import os
 warnings.filterwarnings("ignore")
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(current_dir, os.pardir, os.pardir))
 sys.path.append(project_root)
-from config.configs import *
+
+
+from src.utils import get_information, split_into_char
+from src.config.configs import *
 params = Params()
 
 
@@ -37,13 +39,14 @@ class Dataset(object):
 
         # Positional input
             ## Line_ids 
-        self.line_ids_one_hot, self.line_ids_val_one_hot, self.line_ids_test_one_hot = self._get_lines_id() if num_inputs == 5 else None
+        if num_inputs == 5:
+            self.line_ids_one_hot, self.line_ids_val_one_hot, self.line_ids_test_one_hot = self._get_lines_id() 
 
             ## Length_lines
-        self.length_lines_one_hot, self.length_lines_val_one_hot, self.length_lines_test_one_hot = self._get_length_lines() if num_inputs == 5 else None
+            self.length_lines_one_hot, self.length_lines_val_one_hot, self.length_lines_test_one_hot = self._get_length_lines() 
 
             ## Total_lengths
-        self.total_lines_one_hot, self.total_lines_val_one_hot, self.total_lines_test_one_hot = self._get_total_lines() if num_inputs == 5 else None
+            self.total_lines_one_hot, self.total_lines_val_one_hot, self.total_lines_test_one_hot = self._get_total_lines() 
 
         # Label one-hot
         self.y_train_one_hot, self.y_val_one_hot, self.y_test_one_hot = self._one_hot_encoder()
