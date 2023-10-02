@@ -23,8 +23,12 @@ class HybridEmbeddingModel(object):
         word_embed: Word-level embedding layer
         char_embed: Char-level embedding layer
         pretrained_embedding: "bert", "glove" or None. Default: None
+        glove_embed: glove embedding layer 
+        bert_process: BERT input processing layer
+        bert_layer: BERT embedding layer
         num_classes: Number of classes. Default: 5 ("Do not change")
         """
+        
         super(HybridEmbeddingModel, self).__init__()
         # Params
         self.pretrained_embedding = pretrained_embedding
@@ -63,20 +67,29 @@ class HybridEmbeddingModel(object):
 
 
     def word_level_branch(self, word_input):
+        """
+        arg:
+        - word_input: word-level token embedding
+        """
 
         if str(self.pretrained_embedding).lower() == "bert":
-            # Pretrained BERT embeddings
+            # Pretrained Bert embeddings
             bert_input = self.bert_process(word_input)
             bert_output = self.bert_layer(bert_input, training = False)
             word_embeddings = bert_output['sequence_output']
         else:
-            word_vectors = self.word_vectorizer(word_input)
-            if str(self.pretrained_embedding).lower() == "glove":
-                # Pretrained glove embeddings
-                word_embeddings = self.glove_embed(word_vectors)
+            if (self.word_vectorizer):    
+                if (str(self.pretrained_embedding).lower() == "glove"):
+                    # Get glove embedding
+                    word_vectors = self.word_vectorizer(word_input)
+                    word_embeddings = self.glove_embed(word_vectors)
+                else:
+                    # Original word_embeddings
+                    word_vectors = self.word_vectorizer(word_input)
+                    word_embeddings = self.word_embed(word_vectors)
             else:
-                # Original word_embeddings
-                word_embeddings = self.word_embed(word_vectors)
+                raise Exception("Please provide word vectorizer.")
+    
         x = layers.Conv1D(64, kernel_size=5, padding="same", activation="relu")(word_embeddings)
         x = layers.Dense(128, activation = "relu")(x)
         x = layers.BatchNormalization()(x)
@@ -86,6 +99,10 @@ class HybridEmbeddingModel(object):
 
 
     def char_level_branch(self, char_input):
+        """
+        arg: 
+        - char_input: char-level tokens embedding
+        """
 
         char_vectors = self.char_vectorizer(char_input)
         char_embeddings = self.char_embed(char_vectors)
@@ -99,12 +116,12 @@ class HybridEmbeddingModel(object):
         word_inputs = layers.Input(shape = [], dtype = tf.string, name = "token_input")
         char_inputs = layers.Input(shape = (1, ), dtype = tf.string, name = "char_input")
 
-
+        #------------------------------------------------------
         # Word-level branch
         word_level_output = self.word_level_branch(word_inputs)
         # Char-level branch
         char_level_output = self.char_level_branch(char_inputs)
-
+        #------------------------------------------------------
 
         # Concate two embeddings
         word_char_concat = self.concatenate([word_level_output,char_level_output])
@@ -123,25 +140,43 @@ class HybridEmbeddingModel(object):
                          name="hybrid_embeddings_model")
         model.compile(optimizer = params.OPTIMIZER, loss = params.LOSS,
                metrics = params.METRICS)
+        
+
         return model
     
 
+    
     def _define_checkpoint(self):
-        pass
+        """
+        Define checkpoint for hybrid model
+        """
+        if str(self.pretrained_embedding).lower() == "glove":
+            if not os.path.exists(params.PENTA_GLOVE_MODEL_DIR):
+                os.makedirs(params.PENTA_GLOVE_MODEL_DIR)
+            checkpoint_dir = params.PENTA_GLOVE_MODEL_DIR
+        elif str(self.pretrained_embedding).lower() == "bert":
+            if not os.path.exists(params.PENTA_BERT_MODEL_DIR):
+                os.makedirs(params.PENTA_BERT_MODEL_DIR)
+            checkpoint_dir = params.PENTA_BERT_MODEL_DIR
+        else:
+            if not os.path.exists(params.PENTA_NOR_MODEL_DIR):
+                os.makedirs(params.PENTA_NOR_MODEL_DIR)
+            checkpoint_dir = params.PENTA_NOR_MODEL_DIR
+    
+        checkpoint= tf.keras.callbacks.ModelCheckpoint(
+        filepath = checkpoint_dir + '/best_model.ckpt',
+        monitor = "val_categorical_accuracy",
+        save_best_only = True,
+        save_weights_only = True,
+        verbose = 1
+        )
+
+        print("Create checkpoint for Hybrid-embedding model at: ", checkpoint_dir)
+        return checkpoint
 
 
     def plot_model(self, model):
-        model.compile(optimizer = params.OPTIMIZER, loss = params.LOSS,
-               metrics = params.METRICS)
         plot_model(model)
         return 
     
-
-    @staticmethod
-    def _fit_model(model):
-        model.compile(optimizer = params.OPTIMIZER, loss = params.LOSS,
-               metrics = params.METRICS)
-        print(model.summary())
-        model_history = model.fit()
-        return model_history
     

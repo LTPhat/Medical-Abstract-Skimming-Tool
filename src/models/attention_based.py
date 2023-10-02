@@ -11,7 +11,7 @@ sys.path.append(parent_root)
 from config.configs import Params
 params = Params()
 
-
+## ATENTION-BASED WORD_INPUT MODEL
 
 
 class AttentionPoolingLayer(tf.keras.layers.Layer):
@@ -68,21 +68,51 @@ class AttentionModel(object):
 
 
     def word_level_branch(self, word_input):
-        word_vectors = self.word_vectorizer(word_input)
-        word_embeddings = self.word_embed(word_vectors)
+        """
+        Word-token embedding branch
+        """
+        if str(self.pretrained_embedding).lower() == "bert":
+            # Pretrained Bert embeddings
+            bert_input = self.bert_process(word_input)
+            bert_output = self.bert_layer(bert_input, training = False)
+            word_embeddings = bert_output['sequence_output']
+        else:
+            if (self.word_vectorizer):    
+                if (str(self.pretrained_embedding).lower() == "glove"):
+                    # Get glove embedding
+                    word_vectors = self.word_vectorizer(word_input)
+                    word_embeddings = self.glove_embed(word_vectors)
+                else:
+                    # Original word_embeddings
+                    word_vectors = self.word_vectorizer(word_input)
+                    word_embeddings = self.word_embed(word_vectors)
+            else:
+                raise Exception("Please provide word vectorizer.")
+    
         x = layers.Dense(128, activation = "relu")(word_embeddings)
         x = layers.BatchNormalization()(x)
         word_outputs = layers.Bidirectional(layers.LSTM(64, return_sequences=True))(x)
         return word_outputs
+    
+        # word_vectors = self.word_vectorizer(word_input)
+        # word_embeddings = self.word_embed(word_vectors)
+        # x = layers.Dense(128, activation = "relu")(word_embeddings)
+        # x = layers.BatchNormalization()(x)
+        # word_outputs = layers.Bidirectional(layers.LSTM(64, return_sequences=True))(x)
+        # return word_outputs
+    
 
 
     def fcn(self, total_embed):
-          x = layers.Flatten()(total_embed)
-          x = layers.Dense(64, activation = "relu")(x)
-          x = layers.BatchNormalization()(x)
-          x = layers.Dropout(0.5)(x)
-          x = layers.Dense(self.num_classes, activation = "softmax")(x)
-          return x
+        """
+        Fully-connected block
+        """
+        x = layers.Flatten()(total_embed)
+        x = layers.Dense(64, activation = "relu")(x)
+        x = layers.BatchNormalization()(x)
+        x = layers.Dropout(0.5)(x)
+        output = layers.Dense(self.num_classes, activation = "softmax")(x)
+        return output
 
 
     def _get_model(self):
@@ -103,12 +133,31 @@ class AttentionModel(object):
 
         model= tf.keras.Model(inputs=[word_inputs],
                          outputs= output_layer,
-                         name="tetra_embeddings_model")
+                         name="attention_base_model")
         model.compile(optimizer = params.OPTIMIZER, loss = params.LOSS,
                metrics = params.METRICS)
         return model
     
 
+    def _define_checkpoint(self):
+        checkpoint_dir = params.WORD_MODEL_ATT_DIR
+
+        if not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir)
+
+
+        checkpoint= tf.keras.callbacks.ModelCheckpoint(
+        filepath = checkpoint_dir + '/best_model.ckpt',
+        monitor = "val_categorical_accuracy",
+        save_best_only = True,
+        save_weights_only = True,
+        verbose = 1
+        )
+        print("Create checkpoint for Attention-based model at: ", checkpoint_dir)
+        
+        return checkpoint
+    
+    
     def plot_model(self, model):
         plot_model(model)
         return 
