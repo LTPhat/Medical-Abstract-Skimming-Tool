@@ -151,17 +151,17 @@ class HybridEmbeddingModel(object):
         Define checkpoint for hybrid model
         """
         if str(self.pretrained_embedding).lower() == "glove":
-            if not os.path.exists(params.PENTA_GLOVE_MODEL_DIR):
-                os.makedirs(params.PENTA_GLOVE_MODEL_DIR)
-            checkpoint_dir = params.PENTA_GLOVE_MODEL_DIR
+            if not os.path.exists(params.HYBRID_GLOVE_MODEL_DIR):
+                os.makedirs(params.HYBRID_GLOVE_MODEL_DIR)
+            checkpoint_dir = params.HYBRID_GLOVE_MODEL_DIR
         elif str(self.pretrained_embedding).lower() == "bert":
-            if not os.path.exists(params.PENTA_BERT_MODEL_DIR):
-                os.makedirs(params.PENTA_BERT_MODEL_DIR)
-            checkpoint_dir = params.PENTA_BERT_MODEL_DIR
+            if not os.path.exists(params.HYBRID_BERT_MODEL_DIR):
+                os.makedirs(params.HYBRID_BERT_MODEL_DIR)
+            checkpoint_dir = params.HYBRID_BERT_MODEL_DIR
         else:
-            if not os.path.exists(params.PENTA_NOR_MODEL_DIR):
-                os.makedirs(params.PENTA_NOR_MODEL_DIR)
-            checkpoint_dir = params.PENTA_NOR_MODEL_DIR
+            if not os.path.exists(params.HYBRID_NOR_MODEL_DIR):
+                os.makedirs(params.HYBRID_NOR_MODEL_DIR)
+            checkpoint_dir = params.HYBRID_NOR_MODEL_DIR
     
         checkpoint= tf.keras.callbacks.ModelCheckpoint(
         filepath = checkpoint_dir + '/best_model.ckpt',

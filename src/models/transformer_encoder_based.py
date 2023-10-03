@@ -260,17 +260,17 @@ class TransformerModel(object): # !!!!!!!!!!!!!! CHECK HERE
         """
 
         if str(self.pretrained_embedding).lower() == "glove":
-            if not os.path.exists(params.PENTA_GLOVE_MODEL_DIR):
-                os.makedirs(params.PENTA_GLOVE_MODEL_DIR)
-            checkpoint_dir = params.PENTA_GLOVE_MODEL_DIR
+            if not os.path.exists(params.TF_BASED_GLOVE_MODEL_DIR):
+                os.makedirs(params.TF_BASED_GLOVE_MODEL_DIR)
+            checkpoint_dir = params.TF_BASED_GLOVE_MODEL_DIR
         elif str(self.pretrained_embedding).lower() == "bert":
-            if not os.path.exists(params.PENTA_BERT_MODEL_DIR):
-                os.makedirs(params.PENTA_BERT_MODEL_DIR)
-            checkpoint_dir = params.PENTA_BERT_MODEL_DIR
+            if not os.path.exists(params.TF_BASED_BERT_MODEL_DIR):
+                os.makedirs(params.TF_BASED_BERT_MODEL_DIR)
+            checkpoint_dir = params.TF_BASED_BERT_MODEL_DIR
         else:
-            if not os.path.exists(params.PENTA_NOR_MODEL_DIR):
-                os.makedirs(params.PENTA_NOR_MODEL_DIR)
-            checkpoint_dir = params.PENTA_NOR_MODEL_DIR
+            if not os.path.exists(params.TF_BASED_NOR_MODEL_DIR):
+                os.makedirs(params.TF_BASED_NOR_MODEL_DIR)
+            checkpoint_dir = params.TF_BASED_NOR_MODEL_DIR
     
         checkpoint= tf.keras.callbacks.ModelCheckpoint(
         filepath = checkpoint_dir + '/best_model.ckpt',
