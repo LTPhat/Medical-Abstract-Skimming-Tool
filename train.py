@@ -44,14 +44,22 @@ def main():
     # Word_vectorizer, word_embed
     word_vectorizer, word_embed = embeddings._get_word_embeddings(train_sentences)
 
+    # Get type embedding
+    glove_embed = embeddings._get_glove_embeddings(vectorizer=word_vectorizer, glove_txt=params.GLOVE_DIR) if str(embedding_arg).lower() == "glove" else None
+
+    if str(embedding_arg).lower() == "bert":
+        bert_process, bert_layer = embeddings._get_bert_embeddings()
+    else:
+        bert_process, bert_layer = None, None
 
 
     if str(model_arg).lower() == "att":
-        print("-------------Training Attention-Based model-------------------")
+        print("-------------Training Attention-Based model with pretrained embedding: {}-------------------".format(embedding_arg))
 
         # Word-input dataset
         word_dataset, word_val_dataset, word_test_dataset = dataset._get_word_dataset()
-        att_obj = AttentionModel(word_vectorizer=word_vectorizer, word_embed=word_embed, pretrained_embedding=embedding_arg)
+        att_obj = AttentionModel(word_vectorizer=word_vectorizer, word_embed=word_embed, pretrained_embedding=embedding_arg, 
+                                 glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
         att_model = att_obj._get_model()
         att_checkpoint = att_obj._define_checkpoint()
 
@@ -62,7 +70,8 @@ def main():
                               validation_data=word_val_dataset,
                               validation_steps=int(dataset_size*len(word_val_dataset)),
                               callbacks = [att_checkpoint])
-        print("-------------Training Attention-Based model completed! -------------------")
+        print("-------------Training Attention-Based model completed!-------------------")
+        
         end_time = time.time()
 
         # Get training time
@@ -76,7 +85,7 @@ def main():
         
         # Write results
         with open(params.RESULT_DIR, 'a') as file:
-            file.write("Metrics on Attention-based model: \n")
+            file.write("Metrics on Attention-based model with pretrained embedding {}: \n".format(embedding_arg))
             file.write('Val loss: {} | Val accuracy: {}\n'.format(val_metrics[0], val_metrics[1]))
             file.write('Test loss: {} | Test accuracy: {}\n'.format(test_metrics[0], test_metrics[1]))
             file.write('Time training: {} s\n'.format(training_time))
@@ -86,15 +95,12 @@ def main():
 
 
     elif str(model_arg).lower() == "hybrid":
-        print("-------------Training Hybrid-embedding model-------------------")
+        print("-------------Training Hybrid-embedding model with pretrained embedding {}-------------------".format(embedding_arg))
 
         # Addtional char-vectorizer, char_embed
         train_char = dataset.train_char
         char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
         
-        # Get type embedding
-        glove_embed = embeddings._get_glove_embeddings(vectorizer=word_vectorizer, glove_txt=params.GLOVE_DIR) if str(embedding_arg).lower() == "glove" else None
-        bert_process, bert_layer = embeddings._get_bert_embeddings() if str(embedding_arg).lower() == "bert" else None, None
 
         # Get word-char dataset
         word_char_dataset, word_char_val_dataset, word_char_test_dataset = dataset._get_word_char_dataset()
@@ -126,7 +132,7 @@ def main():
         
         # Write results
         with open(params.RESULT_DIR, 'a') as file:
-            file.write("Metrics on Hybrid-embeding model: \n")
+            file.write("Metrics on Hybrid-embedding model with pretrained embedding {}: \n".format(embedding_arg))
             file.write('Val loss: {} | Val accuracy: {}\n'.format(val_metrics[0], val_metrics[1]))
             file.write('Test loss: {} | Test accuracy: {}\n'.format(test_metrics[0], test_metrics[1]))
             file.write('Time training: {} s\n'.format(training_time))
@@ -135,15 +141,12 @@ def main():
 
 
     elif str(model_arg).lower() == "tf_encoder":
-        print("-------------Training TransformerEncoder-based model-------------------")
+        print("-------------Training TransformerEncoder-based model with pretrained embedding {}-------------------".format(embedding_arg))
 
         # Addtional char-vectorizer, char_embed
         train_char = dataset.train_char
         char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
 
-        # Get type embedding
-        glove_embed = embeddings._get_glove_embeddings(vectorizer=word_vectorizer, glove_txt=params.GLOVE_DIR) if str(embedding_arg).lower() == "glove" else None
-        bert_process, bert_layer = embeddings._get_bert_embeddings() if str(embedding_arg).lower() == "bert" else None, None
 
         # Get penta-dataset
         penta_dataset, penta_val_dataset, penta_test_dataset = dataset._get_penta_dataset()
@@ -176,7 +179,7 @@ def main():
         
         # Write results
         with open(params.RESULT_DIR, 'a') as file:
-            file.write("Metrics on TransformerEncoder-based model: \n")
+            file.write("Metrics on TransformerEncoder-based model with pretrained embedding {}: \n".format(embedding_arg))
             file.write('Val loss: {} | Val accuracy: {}\n'.format(val_metrics[0], val_metrics[1]))
             file.write('Test loss: {} | Test accuracy: {}\n'.format(test_metrics[0], test_metrics[1]))
             file.write('Time training: {} s\n'.format(training_time))
@@ -186,15 +189,12 @@ def main():
 
     else:
 
-        print("-------------Training Penta-embedding model-------------------")
+        print("-------------Training Penta-embedding model with pretrained embedding {}-------------------".format(embedding_arg))
 
         # Addtional char-vectorizer, char_embed
         train_char = dataset.train_char
         char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
 
-        # Get type embedding
-        glove_embed = embeddings._get_glove_embeddings(vectorizer=word_vectorizer, glove_txt=params.GLOVE_DIR) if str(embedding_arg).lower() == "glove" else None
-        bert_process, bert_layer = embeddings._get_bert_embeddings() if str(embedding_arg).lower() == "bert" else None, None
 
         # Get penta-dataset
         penta_dataset, penta_val_dataset, penta_test_dataset = dataset._get_penta_dataset()
@@ -228,12 +228,14 @@ def main():
         
         # Write results
         with open(params.RESULT_DIR, 'a') as file:
-            file.write("Metrics on Penta-embedding model: \n")
+            file.write("Metrics on Penta-embedding model with pretrained embedding {}: \n".format(embedding_arg))
             file.write('Val loss: {} | Val accuracy: {}\n'.format(val_metrics[0], val_metrics[1]))
             file.write('Test loss: {} | Test accuracy: {}\n'.format(test_metrics[0], test_metrics[1]))
             file.write('Time training: {} s\n'.format(training_time))
         file.close()
         print("Writing result completed! Check at results.txt.")
+
+
 
 if __name__ == "__main__":
     main()
