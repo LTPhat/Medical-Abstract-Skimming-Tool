@@ -1,0 +1,11 @@
+tensorflow
+tensorflow_hub
+tensorflow_text
+spacy
+scikit_lean
+pydot
+Pillow
+matplotlib
+pandas
+numpy
+seaborn
