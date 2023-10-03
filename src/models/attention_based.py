@@ -52,7 +52,7 @@ class AttentionPoolingLayer(tf.keras.layers.Layer):
 
 
 class AttentionModel(object):
-    def __init__(self, word_vectorizer, word_embed, pretrained_embedding = None, num_classes = 5):
+    def __init__(self, word_vectorizer, word_embed, pretrained_embedding = None, glove_embed = None, bert_process = None, bert_layer = None, num_classes = 5):
         super(AttentionModel, self).__init__()
 
         # Params
@@ -64,7 +64,9 @@ class AttentionModel(object):
         self.word_vectorizer = word_vectorizer
         # Embedding
         self.word_embed = word_embed
-
+        self.glove_embed = glove_embed
+        self.bert_process =bert_process
+        self.bert_layer = bert_layer
 
 
     def word_level_branch(self, word_input):
@@ -140,11 +142,21 @@ class AttentionModel(object):
     
 
     def _define_checkpoint(self):
-        checkpoint_dir = params.WORD_MODEL_ATT_DIR
-
-        if not os.path.exists(checkpoint_dir):
-            os.makedirs(checkpoint_dir)
-
+        """
+        Define checkpoint
+        """
+        if str(self.pretrained_embedding).lower() == "glove":
+            if not os.path.exists(params.WORD_MODEL_ATT_GLOVE_DIR):
+                os.makedirs(params.WORD_MODEL_ATT_GLOVE_DIR)
+            checkpoint_dir = params.WORD_MODEL_ATT_GLOVE_DIR
+        elif str(self.pretrained_embedding).lower() == "bert":
+            if not os.path.exists(params.WORD_MODEL_ATT_BERT_DIR):
+                os.makedirs(params.WORD_MODEL_ATT_BERT_DIR)
+            checkpoint_dir = params.WORD_MODEL_ATT_BERT_DIR
+        else:
+            if not os.path.exists(params.WORD_MODEL_ATT_NOR_DIR):
+                os.makedirs(params.WORD_MODEL_ATT_NOR_DIR)
+            checkpoint_dir = params.WORD_MODEL_ATT_NOR_DIR
 
         checkpoint= tf.keras.callbacks.ModelCheckpoint(
         filepath = checkpoint_dir + '/best_model.ckpt',
