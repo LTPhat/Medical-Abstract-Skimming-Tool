@@ -1,7 +1,7 @@
 import argparse
 
 
-valid_models = ["hybrid", "att", "tf_decoder", "penta"]
+valid_models = ["hybrid", "att", "tf_encoder", "penta"]
 valid_embeddings = [str(None), "glove", "bert"]
 
 
@@ -11,13 +11,13 @@ def init_argparse():
     prog="Training Model",
     usage="Arguments: --model, --embedding, --batch_size(optional).",
     description="""Example: python main.py --model penta --embedding None --dataset_size 1 --batch_size 32 -- epochs 3
-                 --model: Type of model for training. Expect one of ['hybrid', 'att', 'tf_decoder', 'penta'].
+                 --model: Type of model for training. Expect one of ['hybrid', 'att', 'tf_encoder', 'penta'].
                  --embedding: Type of word-level embedding. Expect one of [None, 'glove', 'bert'].
                  --dataset_size: Dataset size for training. Default: 1 (All dataset).
                  --batch_size: Batch size. Default: 32.
                  --epochs: Epochs. Default: 3."""
 )
-    parser.add_argument("--model", required=True, help='Type of model: hybrid, att, tf_decoder, penta')
+    parser.add_argument("--model", required=True, help='Type of model: hybrid, att, tf_encoder, penta')
     parser.add_argument(
         "--embedding", required=True,
         help='Word embedding: None, Glove or BERT'

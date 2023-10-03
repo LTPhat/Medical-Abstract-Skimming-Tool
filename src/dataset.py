@@ -276,7 +276,7 @@ class Dataset(object):
         # Test set
         penta_test_data = tf.data.Dataset.from_tensor_slices((self.test_sentences, self.test_char,
                                                             self.line_ids_test_one_hot, self.length_lines_test_one_hot, self.total_lines_test_one_hot))
-        penta_test_label = tf.data.Dataset.from_tensor_slices(self.y_val_one_hot)
+        penta_test_label = tf.data.Dataset.from_tensor_slices(self.y_test_one_hot)
         penta_test_dataset = tf.data.Dataset.zip((penta_test_data, penta_test_label))
         penta_test_dataset = penta_test_dataset.batch(self.batch_size).prefetch(tf.data.AUTOTUNE)
 
