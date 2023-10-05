@@ -96,13 +96,6 @@ class AttentionModel(object):
         word_outputs = layers.Bidirectional(layers.LSTM(64, return_sequences=True))(x)
         return word_outputs
     
-        # word_vectors = self.word_vectorizer(word_input)
-        # word_embeddings = self.word_embed(word_vectors)
-        # x = layers.Dense(128, activation = "relu")(word_embeddings)
-        # x = layers.BatchNormalization()(x)
-        # word_outputs = layers.Bidirectional(layers.LSTM(64, return_sequences=True))(x)
-        # return word_outputs
-    
 
 
     def fcn(self, total_embed):
@@ -165,6 +158,7 @@ class AttentionModel(object):
         save_weights_only = True,
         verbose = 1
         )
+        # checkpoint.restore().expect_partial()
         print("Create checkpoint for Attention-based model at: ", checkpoint_dir)
         
         return checkpoint
