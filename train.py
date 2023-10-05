@@ -199,10 +199,8 @@ def main():
         # Get penta-dataset
         penta_dataset, penta_val_dataset, penta_test_dataset = dataset._get_penta_dataset()
         
-        penta_obj = TransformerModel(word_vectorizer=word_vectorizer, char_vectorizer=char_vectorizer, 
-                                    word_embed=word_embed, char_embed=char_embed, num_layers=params.NUM_LAYERS, 
-                                    d_model=params.D_MODEL, nhead=params.N_HEAD, dim_feedforward=params.DIM_FEEDFORWARD,
-                                    pretrained_embedding=embedding_arg, glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
+        penta_obj = PentaEmbeddingModel(word_vectorizer=word_vectorizer, char_vectorizer=char_vectorizer, word_embed = word_embed, char_embed = char_embed,
+                                        pretrained_embedding=embedding_arg, glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
         penta_model = penta_obj._get_model()
 
         penta_checkpoint = penta_obj._define_checkpoint()
