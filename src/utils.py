@@ -49,11 +49,29 @@ def get_information(file_dir):
                 line_infor['text'] = line_split[1].lower()
                 line_infor['line_id'] = line_id
                 line_infor['length_lines'] = len(line_split[1].split(" ")) # Num of words in a line
-                line_infor['total_lines'] = len(lines_in_one_abstract) # Num of lines in an abstract
+                line_infor['total_lines'] = len(lines_in_one_abstract) - 1 # Num of lines in an abstract
                 abstract_samples.append(line_infor)
         else:
             one_abstract += line
     return abstract_samples
+
+
+def get_information_infer(samples):
+    """
+    Extract feature in inference phase
+    """
+
+    total_line = len(samples)
+
+    sample_lines = []
+    for id, line in enumerate(samples):
+        one_line = {}
+        one_line['text'] = str(line)
+        one_line['line_id'] = id
+        one_line['length_lines'] = len(line.split(" "))
+        one_line['total_lines'] = total_line - 1
+        sample_lines.append(one_line)
+    return sample_lines
 
 
 
