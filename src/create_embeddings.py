@@ -8,6 +8,7 @@ import warnings
 warnings.filterwarnings('ignore')
 import sys
 import os
+import pickle
 
 
 parent_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
@@ -45,9 +46,32 @@ class Embeddings(object):
         - word_embed: Word embedding layer
         """
         # Vectorization
-        word_vectorizer = TextVectorization(max_tokens=self.vocab_size, output_sequence_length=self.seq_length)
-        word_vectorizer.adapt(list_sentences)
+        # Check if word_vectorizer obj are saved or not
 
+            # If obj existed at disk
+        if os.path.exists(params.WORD_VECTORIZATION):
+            from_disk = pickle.load(open(params.WORD_VECTORIZATION, "rb"))
+            print("Load pre-saved word_vectorizer object from disk at: ".format(params.WORD_VECTORIZATION))  
+            word_vectorizer = TextVectorization.from_config(from_disk['config'])
+            word_vectorizer.set_weights(from_disk['weights'])
+
+        else:
+            # Create folder to save vectorizer obj
+            if not os.path.exists(params.VECTORIZATION):
+                os.makedirs(params.VECTORIZATION)
+
+            print("Create new word_vectorizer object ...")
+            # Create new word_vectorizer obj
+            word_vectorizer = TextVectorization(max_tokens=self.vocab_size, output_sequence_length=self.seq_length)
+            word_vectorizer.adapt(list_sentences)
+
+            # Save newly created obj
+            pickle.dump({'config': word_vectorizer.get_config(),
+             'weights': word_vectorizer.get_weights()}
+            , open(params.WORD_VECTORIZATION, "wb"))
+
+            print("Saved new word_vectorizer object to disk at: ".format(params.WORD_VECTORIZATION))
+        
         word_vocab = word_vectorizer.get_vocabulary()
 
         print("Word vectorization on training set with vocab size: ", len(word_vocab))
@@ -67,9 +91,28 @@ class Embeddings(object):
         args:
         - list_char: List of chars split from each sentence in list_sentences
         """
-        char_vectorizer = TextVectorization(max_tokens = self.max_tokens,
+            # If obj existed at disk
+        if os.path.exists(params.CHAR_VECTORIZATION):
+            from_disk = pickle.load(open(params.CHAR_VECTORIZATION, "rb"))
+            print("Load pre-saved char_vectorizer object from disk at: ".format(params.CHAR_VECTORIZATION))
+            char_vectorizer = TextVectorization.from_config(from_disk['config'])
+            char_vectorizer.set_weights(from_disk['weights'])
+        else:
+            # Create folder to save vectorizer obj
+            if not os.path.exists(params.VECTORIZATION):
+                os.makedirs(params.VECTORIZATION)
+                
+            print("Create new char_vectorizer object ...")
+            # Create new word_vectorizer obj
+            char_vectorizer = TextVectorization(max_tokens = self.max_tokens,
                                     output_sequence_length=self.output_char_length) 
-        char_vectorizer.adapt(list_char)
+            char_vectorizer.adapt(list_char)
+
+            # Save newly created obj
+            pickle.dump({'config': char_vectorizer.get_config(),
+             'weights': char_vectorizer.get_weights()}
+            , open(params.CHAR_VECTORIZATION, "wb"))
+
         char_vocab = char_vectorizer.get_vocabulary()
 
         print("Char vectorization on training set with vocab size: ", len(char_vocab))
