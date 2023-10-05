@@ -62,25 +62,38 @@ class Params(object):
         self.D_MODEL = 128
 
         # CHECKPOINT DIR
-            ## attention-based dir
-        self.WORD_MODEL_ATT_DIR = project_root + "/checkpoints/word_model"
-            ## penta-model
-        self.PENTA_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/nor_model"
-        self.PENTA_BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/bert_model"
-        self.PENTA_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/glove_model"
-        self.TF_BASED_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model"
-            ## Hybrid model
-        self.HYBRID_NOR_MODEL_DIR = project_root + "/checkpoints/hybrid_model/nor_model"
-        
+        ## attention-based dir
+        self.WORD_MODEL_ATT_NOR_DIR = project_root + "/checkpoint/word_model/nor_model"
+        self.WORD_MODEL_ATT_GLOVE_DIR = project_root + "/checkpoint/word_model/glove_model"
+        self.WORD_MODEL_ATT_BERT_DIR =  project_root + "/checkpoint/word_model/bert_model"
+        ## penta-model
+        self.PENTA_NOR_MODEL_DIR = project_root + "/checkpoint/penta_model/penta_embedding/nor_model"
+        self.PENTA_BERT_MODEL_DIR = project_root + "/checkpoint/penta_model/penta_embedding/bert_model"
+        self.PENTA_GLOVE_MODEL_DIR = project_root + "/checkpoint/penta_model/penta_embedding/glove_model"
+
+        self.TF_BASED_NOR_MODEL_DIR = project_root + "/checkpoint/penta_model/transformer_model/nor_model"
+        self.TF_BASED_GLOVE_MODEL_DIR = project_root + "/checkpoint/penta_model/transformer_model/glove_model"
+        self.TF_BASED_BERT_MODEL_DIR = project_root + "/checkpoint/penta_model/transformer_model/bert_model"
+
+        ## Hybrid model
+        self.HYBRID_NOR_MODEL_DIR = project_root + "/checkpoint/hybrid_model/nor_model"
+        self.HYBRID_GLOVE_MODEL_DIR = project_root + "/checkpoint/hybrid_model/glove_model"
+        self.HYBRID_BERT_MODEL_DIR = project_root + "/checkpoint/hybrid_model/bert_model"
+
+
         # Test-result dir
         self.RESULT_DIR = project_root + "/results.txt"
+
+        # Saved vectorization object pkl
+        self.VECTORIZATION = project_root + "/text_vectorization_obj/"
+        self.WORD_VECTORIZATION = project_root + "/text_vectorization_obj/tv_layer.pkl"
+        self.CHAR_VECTORIZATION = project_root + "/text_vectorization_obj/char_tv_layer.pkl"
+
 
 if __name__ == "__main__":
     params = Params()
     print(os.path.exists(params.DATA_DIR))
-    print(os.path.exists(params.GLOVE_DIR))
     print(os.path.exists(params.RESULT_DIR))
-    # hub = hub.load(params.BERT_EMBED_DIR)
-    print("Done")
+
 
 
