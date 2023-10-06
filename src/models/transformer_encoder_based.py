@@ -66,7 +66,7 @@ class TransformerEncoder(tf.keras.layers.Layer):
 
 
 
-class TransformerModel(object): # !!!!!!!!!!!!!! CHECK HERE
+class TransformerModel(object): 
     def __init__(self, word_vectorizer = None, char_vectorizer = None, word_embed = None, char_embed= None, 
                  num_layers = None, d_model = None, nhead = None, dim_feedforward = None, pretrained_embedding = None, 
                  glove_embed = None, bert_process = None, bert_layer = None, dropout_rate=0.1, num_classes=5):
