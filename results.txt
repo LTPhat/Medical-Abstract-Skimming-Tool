@@ -1,0 +1,28 @@
+Val acc:
+Hybrid_model/nor_model: 0.8165
+
+Att_model/nor_model: 0.82
+
+Penta embedding/nor_model: 0.8808
+Penta embedding/glove: 0.8801
+Penta embedding/bert: 0.8979
+
+Tf_model/nor_model: 0.8720
+Tf_model/glove_model: 0.87495
+Tf_model/bert: 0.8999
+Metrics on Attention-based model with pretrained embedding None: 
+Val loss: 0.6155492663383484 | Val accuracy: 0.7781014442443848
+Test loss: 0.6335271596908569 | Test accuracy: 0.7742491960525513
+Time training: 74.56348085403442 s
+Metrics on Attention-based model with pretrained embedding glove: 
+Val loss: 0.6003813743591309 | Val accuracy: 0.7758506536483765
+Test loss: 0.6126704216003418 | Test accuracy: 0.7725236415863037
+Time training: 45.64053773880005 s
+Metrics on Hybrid-embedding model with pretrained embedding None: 
+Val loss: 0.6212478280067444 | Val accuracy: 0.7726399898529053
+Test loss: 0.6314866542816162 | Test accuracy: 0.7703003287315369
+Time training: 108.28495192527771 s
+Metrics on Hybrid-embedding model with pretrained embedding glove: 
+Val loss: 0.685275673866272 | Val accuracy: 0.739474356174469
+Test loss: 0.6958486437797546 | Test accuracy: 0.7350921034812927
+Time training: 78.13089871406555 s
