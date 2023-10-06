@@ -31,7 +31,7 @@ def read_infer_txt(infer_txt):
         return f.readlines()
 
 
-def infer(abstract):
+def infer(abstract, verbose = True):
     """
     Get prediction from abstract
     args:
@@ -138,13 +138,27 @@ def infer(abstract):
         # Get prediction
         preds = penta_model.predict(x = (infer_sentences, infer_chars, line_ids_one_hot, length_lines_one_hot, total_lines_one_hot))
 
-    return preds
+    class_index = dataset.classes
+    preds_index = np.argmax(preds, axis = 1)
+    preds_class = [class_index[preds_index[i]] for i in range(0, len(preds_index))]
+    
+    if verbose:
+        for i, sent in enumerate(infer_sentences):
+            print("{} --> Pred: {} | Prob: {}".format(sent, preds_class[i], preds[i][preds_index[i]]))
+    
+    return preds_class
 
 
 if __name__ == "__main__":
+    params = Params()
+    dataset = Dataset(train_txt=params.TRAIN_DIR, val_txt=params.VAL_DIR, test_txt=params.TEST_DIR)
     infer_txt = "infer_abstract.txt"
     abstract_list = read_infer_txt(infer_txt=infer_txt)
-    preds = infer(abstract=abstract_list[0])
-    print(preds)
+    for i, abtract in enumerate(abstract_list):
+        print("------------Predict abstract number {}--------------".format(i+1))
+        preds = infer(abstract= abtract)
+        print("Result:", preds)
+        print()
 
+    
 
