@@ -6,11 +6,11 @@ from sklearn.metrics import confusion_matrix
 from sklearn.linear_model import LogisticRegression
 import sys
 import os
-parent_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
+parent_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir, os.pardir))
 sys.path.append(parent_root)
-from dataset import *
+from src.dataset import *
 
-from config.configs import Params
+from src.config.configs import Params
 param = Params()
 
 ## Naives Bayes, Logistic Regression
@@ -48,13 +48,11 @@ if __name__ == "__main__":
     y_train = dataset.y_train
     y_val = dataset.y_val
     y_test = dataset.y_test
-
     val_score, test_score =BaseLine(vectorizer=TfidfVectorizer(), 
                                     model=LogisticRegression()).train(
                                     X_train=train_sentences, y_train=y_train,
                                     X_val=val_sentences, y_val=y_val,
                                     X_test=test_sentences, y_test=y_test)
     
-
     print("Baseline Val score: ", val_score)
     print("Baseline Test score: ", test_score)

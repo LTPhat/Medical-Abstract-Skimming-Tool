@@ -61,6 +61,7 @@ def main():
         att_obj = AttentionModel(word_vectorizer=word_vectorizer, word_embed=word_embed, pretrained_embedding=embedding_arg, 
                                  glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
         att_model = att_obj._get_model()
+        print(att_model.summary())
         att_checkpoint = att_obj._define_checkpoint()
 
         # Start measuring time
@@ -109,6 +110,7 @@ def main():
                                           glove_embed=glove_embed, bert_process=bert_process, bert_layer= bert_layer)
         
         hybrid_model = hybrid_obj._get_model()
+        print(hybrid_model.summary())
         hybrid_checkpoint = hybrid_obj._define_checkpoint()
 
         # Start measuring time
@@ -155,7 +157,7 @@ def main():
                                     d_model=params.D_MODEL, nhead=params.N_HEAD, dim_feedforward=params.DIM_FEEDFORWARD,
                                     pretrained_embedding=embedding_arg, glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
         tf_model = tf_obj._get_model()
-
+        print(tf_model.summary())
         tf_checkpoint = tf_obj._define_checkpoint()
 
         # Start measuring time
@@ -202,7 +204,7 @@ def main():
         penta_obj = PentaEmbeddingModel(word_vectorizer=word_vectorizer, char_vectorizer=char_vectorizer, word_embed = word_embed, char_embed = char_embed,
                                         pretrained_embedding=embedding_arg, glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
         penta_model = penta_obj._get_model()
-
+        print(penta_model.summary())
         penta_checkpoint = penta_obj._define_checkpoint()
 
         # Start measuring time
