@@ -121,6 +121,9 @@ class Dataset(object):
         self.y_train = label_encoder.fit_transform(self.train_df["target"].to_numpy())
         self.y_val = label_encoder.transform(self.val_df["target"].to_numpy())
         self.y_test = label_encoder.transform(self.test_df["target"].to_numpy())
+        
+        # Get label index
+        self.classes = label_encoder.classes_
         return self.y_train, self.y_val, self.y_test
 
 
