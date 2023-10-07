@@ -12,9 +12,10 @@ from inference import *
 from src.config.configs import Params
 
 params = Params()
+
 st.set_page_config(
     page_title="Abstract Skimming Tool",
-    page_icon="🧊",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -22,13 +23,26 @@ st.set_page_config(
 
 MODEL_MAP = {"Penta-embedding model": "penta", "TransformerEncoder-based model": "tf_encoder"}
 
+# Colors for prediction
+BACK_GROUNDS = ["background: rgb(0,0,0); background: linear-gradient(29deg, rgba(0,0,0,1) 75%, rgba(213,0,0,1) 95%);",
+               "background: rgb(0,0,0); background: linear-gradient(29deg, rgba(0,0,0,1) 75%, rgba(0,183,213,1) 95%);",
+               "background: rgb(0,0,0); background: linear-gradient(29deg, rgba(0,0,0,1) 75%, rgba(213,164,0,1) 95%);",
+               "background: rgb(0,0,0); background: linear-gradient(29deg, rgba(0,0,0,1) 75%, rgba(54,213,0,1) 95%);",
+               "background: rgb(0,0,0); background: linear-gradient(29deg, rgba(0,0,0,1) 75%, rgba(125,0,213,1) 95%);",
+               ]
+
 
 def get_embeddings(embedding_arg):
+    """
+    Load embeddings from embedding_arg
+    """
+
     embedding_arg = str(embedding_arg).lower()
     dataset = Dataset(train_txt=params.TRAIN_DIR, val_txt=params.VAL_DIR, test_txt=params.TEST_DIR)
     embeddings = Embeddings()
     class_index = dataset.classes
-    # # Word_vectorizer, word_embed
+
+    # Word_vectorizer, word_embed
     word_vectorizer, word_embed = embeddings._get_word_embeddings(dataset.train_sentences)
     char_vectorizer, char_embed = embeddings._get_char_embeddings(dataset.train_char)
 
@@ -47,7 +61,7 @@ def get_embeddings(embedding_arg):
 def load_model(model, word_vectorizer, char_vectorizer, word_embed, char_embed, pretrained_embedding,
                glove_embed, bert_process, bert_layer):
     """
-    Load model
+    Load model from user's request
     """
 
     model = str(MODEL_MAP[model]).lower()
@@ -106,33 +120,67 @@ def put_sentences_into_classes(infer_sentences, preds_class):
 
 
 
-def main():
+@st.cache_data(experimental_allow_widgets=True)
+def pre_load():
+    """
+    Pre-load some element when loading app
+    """
+    st.markdown("<h1 style='text-align: center; color:#f7cf25; font-family: cursive; padding: 20px; font-size: 40px; '>Abstract Skimming Tool</h1>",
+                unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #FFFFFF; font-family: cursive; padding: 0px; margin: 20px; margin-bottom: 30px; font-size: 20px; '>An NLP model enables researchers to skim paper abstracts and extract information better.</h3>",
+                unsafe_allow_html=True)
+    st.write()
+    st.write()
 
-    st.title("Abstract Skimming Tool")
+    # Selectbox 1
     model_options = ["Penta-embedding model","TransformerEncoder-based model"]
+    
+    # Selectbox 2
     embed_options = {
         "Penta-embedding model": ["None", "Glove", "BERT"],
         "TransformerEncoder-based model": ["None", "Glove", "BERT"],
     }
+    # Get option from user
     model = st.sidebar.selectbox("Select your model", model_options)
     pretrained_embedding = st.sidebar.selectbox("Select embedding for {}".format(model), embed_options[model])
+
+    # Load properties from user's option
     word_vectorizer, char_vectorizer, word_embed, char_embed, glove_embed, bert_process, bert_layer, class_index = get_embeddings(pretrained_embedding)
     loaded_model = load_model(model=model, word_vectorizer= word_vectorizer, char_vectorizer = char_vectorizer,
                                       word_embed=word_embed, char_embed=char_embed, pretrained_embedding=pretrained_embedding,
                                       glove_embed=glove_embed, bert_process=bert_process, bert_layer = bert_layer)
+
+    return loaded_model, class_index
+
+
+
+def get_prediction(loaded_model, class_index):
+    """
+    Get prediction
+    """
+
     col1, col2 = st.columns(2)
 
     # -------------COL 1---------------------
     with col1:
         st.write('Enter your abstract: ')
-        abstract = st.text_area(label='', height=800)
-        predict = st.button('Extract !')
+        abstract = st.text_area(label='', height=400)
+        predict = st.button('Extract')
     
     
     if predict:
         with st.spinner('Wait for prediction....'):
-            # --------------Extract feature-------------------------    
+            # --------------Extract feature-------------------------
+            
+            # Sentencizer
             list_sens = sent_tokenize(abstract)
+
+            # Store original sentence
+            list_sens_org = list_sens
+
+            #Replace numeric at @
+            list_sens = replace_numeric_chars_with_at(list_sens)
+
             # Extract features
             line_samples = get_information_infer(list_sens)
 
@@ -157,22 +205,25 @@ def main():
         
             preds = loaded_model.predict(x = (infer_sentences, infer_chars, line_ids_one_hot, length_lines_one_hot, total_lines_one_hot))
             preds_index = np.argmax(preds, axis = 1)
+
             # Get label
             preds_class = [class_index[preds_index[i]] for i in range(0, len(preds_index))]
-            objective, background, method, conclusion, result = put_sentences_into_classes(infer_sentences=infer_sentences, preds_class=preds_class)
+            objective, background, method, conclusion, result = put_sentences_into_classes(infer_sentences=list_sens_org, preds_class=preds_class)
 
         with col2:
-            st.markdown(f'### Objective : ')
-            st.write(f'{objective}')
-            st.markdown(f'### Background : ')
-            st.write(f'{background}')
-            st.markdown(f'### Methods : ')
-            st.write(f'{method}')
-            st.markdown(f'### Result : ')
-            st.write(f'{result}')
-            st.markdown(f'### Conclusion : ')
-            st.write(f'{conclusion}')
+            st.markdown(f'### Objective: ')
+            get_block(objective,BACK_GROUNDS[0])
+            st.markdown(f'### Background: ')
+            get_block(background,BACK_GROUNDS[1])
+            st.markdown(f'### Method: ')
+            get_block(method, BACK_GROUNDS[2])
+            st.markdown(f'### Result: ')
+            get_block(result, BACK_GROUNDS[3])
+            st.markdown(f'### Conclusion: ')
+            get_block(conclusion, BACK_GROUNDS[4])
 
 
 if __name__ == "__main__":
-    main()
+    set_background("images/bg3.jpg")
+    loaded_model, class_index = pre_load()
+    get_prediction(loaded_model=loaded_model, class_index=class_index)
