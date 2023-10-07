@@ -63,22 +63,22 @@ class Params(object):
 
         # CHECKPOINT DIR
         ## attention-based dir
-        self.WORD_MODEL_ATT_NOR_DIR = project_root + "/checkpoint/word_model/nor_model"
-        self.WORD_MODEL_ATT_GLOVE_DIR = project_root + "/checkpoint/word_model/glove_model"
-        self.WORD_MODEL_ATT_BERT_DIR =  project_root + "/checkpoint/word_model/bert_model"
+        self.WORD_MODEL_ATT_NOR_DIR = project_root + "/checkpoints/word_model/nor_model"
+        self.WORD_MODEL_ATT_GLOVE_DIR = project_root + "/checkpoints/word_model/glove_model"
+        self.WORD_MODEL_ATT_BERT_DIR =  project_root + "/checkpoints/word_model/bert_model"
         ## penta-model
-        self.PENTA_NOR_MODEL_DIR = project_root + "/checkpoint/penta_model/penta_embedding/nor_model"
-        self.PENTA_BERT_MODEL_DIR = project_root + "/checkpoint/penta_model/penta_embedding/bert_model"
-        self.PENTA_GLOVE_MODEL_DIR = project_root + "/checkpoint/penta_model/penta_embedding/glove_model"
+        self.PENTA_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/penta_embedding/nor_model"
+        self.PENTA_BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/penta_embedding/bert_model"
+        self.PENTA_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/penta_embedding/glove_model"
 
-        self.TF_BASED_NOR_MODEL_DIR = project_root + "/checkpoint/penta_model/transformer_model/nor_model"
-        self.TF_BASED_GLOVE_MODEL_DIR = project_root + "/checkpoint/penta_model/transformer_model/glove_model"
-        self.TF_BASED_BERT_MODEL_DIR = project_root + "/checkpoint/penta_model/transformer_model/bert_model"
+        self.TF_BASED_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model/nor_model"
+        self.TF_BASED_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model/glove_model"
+        self.TF_BASED_BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model/bert_model"
 
         ## Hybrid model
-        self.HYBRID_NOR_MODEL_DIR = project_root + "/checkpoint/hybrid_model/nor_model"
-        self.HYBRID_GLOVE_MODEL_DIR = project_root + "/checkpoint/hybrid_model/glove_model"
-        self.HYBRID_BERT_MODEL_DIR = project_root + "/checkpoint/hybrid_model/bert_model"
+        self.HYBRID_NOR_MODEL_DIR = project_root + "/checkpoints/hybrid_model/nor_model"
+        self.HYBRID_GLOVE_MODEL_DIR = project_root + "/checkpoints/hybrid_model/glove_model"
+        self.HYBRID_BERT_MODEL_DIR = project_root + "/checkpoints/hybrid_model/bert_model"
 
 
         # Test-result dir
