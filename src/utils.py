@@ -4,7 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
-
+import streamlit as st
+import base64
 
 
 def get_lines(txt_url):
@@ -133,3 +134,48 @@ def get_confusion_matrix(y_true, y_pred, classes,
     plt.ylabel('True label')
 
     plt.show()
+
+
+
+# ---------------------Streamlit App utils------------------------------
+
+# Decode image
+def get_base64(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+
+# Set background for local web
+def set_background(png_file):
+    bin_str = get_base64(png_file)
+    page_bg_img = '''
+    <style>
+    .stApp {
+    background-image: url("data:image/png;base64,%s");
+    background-size: cover;
+    }
+    </style>
+    ''' % bin_str
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+
+def get_block(custom_text, back_ground):
+    block = f"""
+        <div style="
+                    {back_ground}
+                    border-radius: 6px;
+                    min-height: 80px;
+                    padding: 20px;
+                    --shadow: 1px 1px 1px 1px rgb(0 0 0 / 0.25);
+                    box-shadow: var(--shadow);
+                    border-radius: 25px;
+                    box-sizing: border-box;
+                    text-align: justify;
+                    color: transparent;
+                    ">
+                    <h4 style="color:#FFFFFFF; font-family: cursive; font-size: 16px; font-weight: 200">
+                            {custom_text}</h4>
+                    </div>
+                    </br>"""
+    st.markdown(block, unsafe_allow_html=True)
