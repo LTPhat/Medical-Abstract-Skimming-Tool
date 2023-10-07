@@ -16,7 +16,7 @@ import pandas as pd
 from args import init_infer_argparse, check_valid_args
 import warnings
 warnings.filterwarnings("ignore")
-
+import re
 
 
 
@@ -26,9 +26,22 @@ CHECK_POINT_MAP = {"att":{"none": params.WORD_MODEL_ATT_NOR_DIR, "glove": params
                  "tf_encoder": {"none": params.TF_BASED_NOR_MODEL_DIR, "glove": params.TF_BASED_GLOVE_MODEL_DIR, "bert": params.TF_BASED_BERT_MODEL_DIR}, 
                  "penta": {"none":params.PENTA_NOR_MODEL_DIR, "glove":params.PENTA_GLOVE_MODEL_DIR, "bert": params.PENTA_BERT_MODEL_DIR}}
 
+
 def read_infer_txt(infer_txt):
     with open(infer_txt, "r") as f:
         return f.readlines()
+
+
+def replace_numeric_chars_with_at(list_sencentes):
+    """
+    Replace numeric characters with "@"
+    """
+    result = []
+    for sent in list_sencentes:
+        res = re.sub(r'\d', '@', sent)
+        result.append(res)
+    return result
+
 
 
 def infer(abstract, verbose = True):
@@ -47,6 +60,12 @@ def infer(abstract, verbose = True):
 
     # Sentencizer
     list_sens = sent_tokenize(abstract)
+
+    # Store original sentence
+    list_sens_org = list_sens
+
+    #Replace numeric at @
+    list_sens = replace_numeric_chars_with_at(list_sens)
 
     # Extract features
     line_samples = get_information_infer(list_sens)
@@ -143,7 +162,7 @@ def infer(abstract, verbose = True):
     preds_class = [class_index[preds_index[i]] for i in range(0, len(preds_index))]
     
     if verbose:
-        for i, sent in enumerate(infer_sentences):
+        for i, sent in enumerate(list_sens_org):
             print("{} --> Pred: {} | Prob: {}".format(sent, preds_class[i], preds[i][preds_index[i]]))
     
     return preds_class
@@ -156,7 +175,7 @@ if __name__ == "__main__":
     abstract_list = read_infer_txt(infer_txt=infer_txt)
     for i, abtract in enumerate(abstract_list):
         print("------------Predict abstract number {}--------------".format(i+1))
-        preds = infer(abstract= abtract)
+        preds = infer(abstract=abtract)
         print("Result:", preds)
         print()
 
