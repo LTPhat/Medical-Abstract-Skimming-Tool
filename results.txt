@@ -1,15 +1,4 @@
-Val acc:
-Hybrid_model/nor_model: 0.8165
-
-Att_model/nor_model: 0.82
-
-Penta embedding/nor_model: 0.8808
-Penta embedding/glove: 0.8801
-Penta embedding/bert: 0.8979
-
-Tf_model/nor_model: 0.8720
-Tf_model/glove_model: 0.87495
-Tf_model/bert: 0.8999
+Test on 0.05 dataset
 Metrics on Attention-based model with pretrained embedding None: 
 Val loss: 0.6155492663383484 | Val accuracy: 0.7781014442443848
 Test loss: 0.6335271596908569 | Test accuracy: 0.7742491960525513
