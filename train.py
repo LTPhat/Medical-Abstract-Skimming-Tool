@@ -2,14 +2,12 @@ from src.config.configs import *
 from src.create_embeddings import *
 from src.dataset import *
 from src.models.baseline import *
-from src.models.attention_based import *
 from src.models.transformer_encoder_based import *
 from src.models.hybrid_embeddings_model import *
 from src.models.penta_embeddings_model import *
-from args import init_argparse, check_valid_args
+from src.models.hierarchy_BiLSTM import *
+from args import init_argparse, check_valid_args# Addtional char-vectorizer, char_embed
 import time
-
-
 
 def main():
     # Define config params
@@ -40,9 +38,13 @@ def main():
     train_sentences = dataset.train_sentences
     val_sentences = dataset.val_sentences
     test_sentences = dataset.test_sentences
+    
+    # Char input
+    train_char = dataset.train_char
 
     # Word_vectorizer, word_embed
     word_vectorizer, word_embed = embeddings._get_word_embeddings(train_sentences)
+    char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
 
     # Get type embedding
     glove_embed = embeddings._get_glove_embeddings(vectorizer=word_vectorizer, glove_txt=params.GLOVE_DIR) if str(embedding_arg).lower() == "glove" else None
@@ -53,54 +55,10 @@ def main():
         bert_process, bert_layer = None, None
 
 
-    if str(model_arg).lower() == "att":
-        print("-------------Training Attention-Based model with pretrained embedding: {}-------------------".format(embedding_arg))
 
-        # Word-input dataset
-        word_dataset, word_val_dataset, word_test_dataset = dataset._get_word_dataset()
-        att_obj = AttentionModel(word_vectorizer=word_vectorizer, word_embed=word_embed, pretrained_embedding=embedding_arg, 
-                                 glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
-        att_model = att_obj._get_model()
-        print(att_model.summary())
-        att_checkpoint = att_obj._define_checkpoint()
-
-        # Start measuring time
-        start_time = time.time()
-        att_hist = att_model.fit(word_dataset, steps_per_epoch=int(dataset_size*len(word_dataset)),
-                              epochs=params.EPOCHS,
-                              validation_data=word_val_dataset,
-                              validation_steps=int(dataset_size*len(word_val_dataset)),
-                              callbacks = [att_checkpoint])
-        print("-------------Training Attention-Based model completed!-------------------")
-        
-        end_time = time.time()
-
-        # Get training time
-        training_time = end_time - start_time
-
-        # Evaluation
-        print("-------------Evaluate on validation set -------------------")
-        val_metrics = att_model.evaluate(word_val_dataset)
-        print("-------------Evaluate on test set -------------------")
-        test_metrics = att_model.evaluate(word_test_dataset)
-        
-        # Write results
-        with open(params.RESULT_DIR, 'a') as file:
-            file.write("Metrics on Attention-based model with pretrained embedding {}: \n".format(embedding_arg))
-            file.write('Val loss: {} | Val accuracy: {}\n'.format(val_metrics[0], val_metrics[1]))
-            file.write('Test loss: {} | Test accuracy: {}\n'.format(test_metrics[0], test_metrics[1]))
-            file.write('Time training: {} s\n'.format(training_time))
-        file.close()
-        print("Writing result completed! Check at results.txt.")
-
-
-
-    elif str(model_arg).lower() == "hybrid":
+    if str(model_arg).lower() == "hybrid":
         print("-------------Training Hybrid-embedding model with pretrained embedding {}-------------------".format(embedding_arg))
 
-        # Addtional char-vectorizer, char_embed
-        train_char = dataset.train_char
-        char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
         
 
         # Get word-char dataset
@@ -145,10 +103,6 @@ def main():
     elif str(model_arg).lower() == "tf_encoder":
         print("-------------Training TransformerEncoder-based model with pretrained embedding {}-------------------".format(embedding_arg))
 
-        # Addtional char-vectorizer, char_embed
-        train_char = dataset.train_char
-        char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
-
 
         # Get penta-dataset
         penta_dataset, penta_val_dataset, penta_test_dataset = dataset._get_penta_dataset()
@@ -188,15 +142,51 @@ def main():
         file.close()
         print("Writing result completed! Check at results.txt.")
     
+    elif str(model_arg).lower() == "bilstm":
+
+        print("-------------Training Hierarchy-BiLSTM model model with pretrained embedding {}-------------------".format(embedding_arg))
+
+
+        # Get penta-dataset
+        penta_dataset, penta_val_dataset, penta_test_dataset = dataset._get_penta_dataset(adjust=True)
+        bilstm_obj = HierarchyBiLSTM(word_vectorizer=word_vectorizer, char_vectorizer=char_vectorizer, 
+                                    word_embed=word_embed, char_embed=char_embed,
+                                    pretrained_embedding=embedding_arg, glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)
+        bilstm_model = bilstm_obj._get_model()
+        print(bilstm_model.summary())
+        bilstm_checkpoint = bilstm_obj._define_checkpoint()
+
+        # Start measuring time
+        start_time = time.time()
+        bilstm_hist = bilstm_model.fit(penta_dataset, steps_per_epoch=int(dataset_size*len(penta_dataset)),
+                              epochs=params.EPOCHS,
+                              validation_data=penta_val_dataset,
+                              validation_steps=int(dataset_size*len(penta_val_dataset)),
+                              callbacks = [bilstm_checkpoint])
+        print("-------------Training Hierarchy-BiLSTM model completed!---------------------")
+        end_time = time.time()
+
+        # Get training time
+        training_time = end_time - start_time
+
+        # Evaluation
+        print("-------------Evaluate on validation set -------------------")
+        val_metrics = bilstm_model.evaluate(penta_val_dataset)
+        print("-------------Evaluate on test set -------------------")
+        test_metrics = bilstm_model.evaluate(penta_test_dataset)
+        
+        # Write results
+        with open(params.RESULT_DIR, 'a') as file:
+            file.write("Metrics on Hierarchy-BiLSTM model model with pretrained embedding {}: \n".format(embedding_arg))
+            file.write('Val loss: {} | Val accuracy: {}\n'.format(val_metrics[0], val_metrics[1]))
+            file.write('Test loss: {} | Test accuracy: {}\n'.format(test_metrics[0], test_metrics[1]))
+            file.write('Time training: {} s\n'.format(training_time))
+        file.close()
+        print("Writing result completed! Check at results.txt.")
 
     else:
 
         print("-------------Training Penta-embedding model with pretrained embedding {}-------------------".format(embedding_arg))
-
-        # Addtional char-vectorizer, char_embed
-        train_char = dataset.train_char
-        char_vectorizer, char_embed = embeddings._get_char_embeddings(train_char)
-
 
         # Get penta-dataset
         penta_dataset, penta_val_dataset, penta_test_dataset = dataset._get_penta_dataset()
