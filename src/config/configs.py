@@ -56,20 +56,21 @@ class Params(object):
         self.BERT_EMBED_DIR =  project_root + "/bert/experts_bert_pubmed_2"                # Pretrained BERT layer
 
         # TRANSFORMER MODEL PARAMS
-        self.NUM_LAYERS = 2
+        self.NUM_LAYERS = 4
         self.N_HEAD = 8
         self.DIM_FEEDFORWARD = 256
         self.D_MODEL = 128
 
         # CHECKPOINT DIR
-        ## attention-based dir
-        self.WORD_MODEL_ATT_NOR_DIR = project_root + "/checkpoints/word_model/nor_model"
-        self.WORD_MODEL_ATT_GLOVE_DIR = project_root + "/checkpoints/word_model/glove_model"
-        self.WORD_MODEL_ATT_BERT_DIR =  project_root + "/checkpoints/word_model/bert_model"
+
         ## penta-model
         self.PENTA_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/penta_embedding/nor_model"
         self.PENTA_BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/penta_embedding/bert_model"
         self.PENTA_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/penta_embedding/glove_model"
+
+        self.PENTA_BILSTM_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/hierarchy_BiLSTM/nor_model"
+        self.PENTA_BILSTM_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/hierarchy_BiLSTM/glove_model"
+        self.PENTA_BILSTM_BERT_MODEL_DIR = project_root + "/checkpoints/penta_model/hierarchy_BiLSTM/bert_model"
 
         self.TF_BASED_NOR_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model/nor_model"
         self.TF_BASED_GLOVE_MODEL_DIR = project_root + "/checkpoints/penta_model/transformer_model/glove_model"

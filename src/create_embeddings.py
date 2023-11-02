@@ -91,7 +91,8 @@ class Embeddings(object):
         args:
         - list_char: List of chars split from each sentence in list_sentences
         """
-            # If obj existed at disk
+        
+         # If obj existed at disk
         if os.path.exists(params.CHAR_VECTORIZATION):
             from_disk = pickle.load(open(params.CHAR_VECTORIZATION, "rb"))
             print("Load pre-saved char_vectorizer object from disk at: ".format(params.CHAR_VECTORIZATION))
