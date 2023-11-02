@@ -19,9 +19,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+#### ADD BILSTM MODEL
 
-
-MODEL_MAP = {"Penta-embedding model": "penta", "TransformerEncoder-based model": "tf_encoder"}
+MODEL_MAP = {"Penta-embedding model": "penta", "TransformerEncoder-based model": "tf_encoder", "Hierarchy-BiLSTM": "bilstm"}
 
 # Colors for prediction
 BACK_GROUNDS = ["background: rgb(0,0,0); background: linear-gradient(29deg, rgba(0,0,0,1) 75%, rgba(213,0,0,1) 95%);",
@@ -74,10 +74,19 @@ def load_model(model, word_vectorizer, char_vectorizer, word_embed, char_embed, 
                                         glove_embed=glove_embed, bert_process=bert_process, bert_layer=bert_layer)._get_model()
         
         loaded_model.load_weights(model_dir + "/best_model.ckpt")
-    else:
+        
+    elif model == "tf_encoder":
         loaded_model = TransformerModel(word_vectorizer=word_vectorizer, char_vectorizer=char_vectorizer, word_embed=word_embed, char_embed = char_embed,
                                 num_layers=params.NUM_LAYERS, d_model=params.D_MODEL, nhead=params.N_HEAD,
                                 dim_feedforward=params.DIM_FEEDFORWARD,pretrained_embedding=pretrained_embedding, glove_embed=glove_embed,
+                                bert_process=bert_process, bert_layer= bert_layer)._get_model()
+        
+        model_dir = CHECK_POINT_MAP[model][pretrained_embedding]
+        loaded_model.load_weights(model_dir + "/best_model.ckpt")
+    
+    else:
+        loaded_model = HierarchyBiLSTM(word_vectorizer=word_vectorizer, char_vectorizer=char_vectorizer, word_embed=word_embed, char_embed = char_embed,
+                                pretrained_embedding=pretrained_embedding, glove_embed=glove_embed,
                                 bert_process=bert_process, bert_layer= bert_layer)._get_model()
         
         model_dir = CHECK_POINT_MAP[model][pretrained_embedding]
@@ -133,12 +142,13 @@ def pre_load():
     st.write()
 
     # Selectbox 1
-    model_options = ["Penta-embedding model","TransformerEncoder-based model"]
+    model_options = ["Penta-embedding model","TransformerEncoder-based model", "Hierarchy-BiLSTM"]
     
     # Selectbox 2
     embed_options = {
         "Penta-embedding model": ["None", "Glove", "BERT"],
         "TransformerEncoder-based model": ["None", "Glove", "BERT"],
+        "Hierarchy-BiLSTM model": ["Glove", "BERT"],
     }
     # Get option from user
     model = st.sidebar.selectbox("Select your model", model_options)
